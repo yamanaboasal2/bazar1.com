@@ -5,7 +5,7 @@ app = Flask(__name__)
 
 CATALOG_URL = "http://catalog:5001"
 ORDER_URL   = "http://order:5002"
-
+//front
 @app.route("/")
 def home():
     return "Frontend working 🚀"
