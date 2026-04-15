@@ -24,7 +24,7 @@ def purchase(id):
         requests.post(f"{CATALOG_URL}/update/{id}")
         return jsonify({"message": f"bought book {book['title']}"})
     else:
-        return jsonify({"message": "out of stock"})
+        return jsonify({"message": "out of stock right now!"})
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5002)
