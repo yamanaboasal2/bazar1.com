@@ -3,26 +3,27 @@ import requests
 
 app = Flask(__name__)
 
-CATALOG_URL = "http://localhost:5001"
-ORDER_URL = "http://localhost:5002"
+CATALOG_URL = "http://catalog:5001"
+ORDER_URL   = "http://order:5002"
 
-# search من خلال frontend
+@app.route("/")
+def home():
+    return "Frontend working 🚀"
+
 @app.route('/search/<topic>')
 def search(topic):
-    response = requests.get(f"{CATALOG_URL}/search/{topic}")
-    return jsonify(response.json())
+    resp = requests.get(f"{CATALOG_URL}/search/{topic}")
+    return jsonify(resp.json())
 
-# info من خلال frontend
 @app.route('/info/<int:id>')
 def info(id):
-    response = requests.get(f"{CATALOG_URL}/info/{id}")
-    return jsonify(response.json())
+    resp = requests.get(f"{CATALOG_URL}/info/{id}")
+    return jsonify(resp.json())
 
-# purchase من خلال frontend
-@app.route('/purchase/<int:id>')
+@app.route('/purchase/<int:id>', methods=['POST'])
 def purchase(id):
-    response = requests.get(f"{ORDER_URL}/purchase/{id}")
-    return jsonify(response.json())
+    resp = requests.post(f"{ORDER_URL}/purchase/{id}")
+    return resp.json()
 
-# تشغيل السيرفر
-app.run(port=5000, debug=True)
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=5000)
