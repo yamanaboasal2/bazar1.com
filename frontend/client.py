@@ -3,7 +3,7 @@ import requests
 BASE_URL = "http://localhost:5000"
 
 def menu():
-    print("\n===== Bazar.com =====")
+    print("\n===== Our Bazar.com =====")
     print("1. Search by topic")
     print("2. Get book info")
     print("3. Purchase book")
@@ -13,9 +13,9 @@ while True:
     menu()
     choice = input("Enter your choice: ")
 
-    # 🔍 search
+    # search :
     if choice == "1":
-        topic = input("Enter topic: ")
+        topic = input("Enter the topic: ")
         try:
             res = requests.get(f"{BASE_URL}/search/{topic}")
             data = res.json()
@@ -25,7 +25,7 @@ while True:
         except:
             print("Error in search")
 
-    # 📘 info
+    # info of the book 
     elif choice == "2":
         book_id = input("Enter book ID: ")
         try:
@@ -35,7 +35,7 @@ while True:
         except:
             print("Error in info")
 
-    # 🛒 purchase
+    # purchase
     elif choice == "3":
         book_id = input("Enter book ID: ")
         try:
@@ -45,9 +45,9 @@ while True:
         except:
             print("Error in purchase")
 
-    # ❌ exit
+    # exit
     elif choice == "4":
-        print("Goodbye 👋")
+        print("Goodbye")
         break
 
     else:

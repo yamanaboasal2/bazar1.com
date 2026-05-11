@@ -1,7 +1,10 @@
 from flask import Flask, jsonify
 import csv
-//....
+
+# Create Flask application instance
 app = Flask(__name__)
+
+# Define the CSV file that stores the catalog data
 FILE = "catalog.csv"
 
 def read_catalog():
@@ -24,25 +27,31 @@ def write_catalog(data):
 
 @app.route("/")
 def home():
-    return "Catalog working ✅"
+    return "Catalog working correctly "
 
+# Search books by topic
 @app.route('/search/<topic>')
 def search(topic):
     data = read_catalog()
     result = []
+     # Filter books by topic
     for book in data:
         if book['topic'].lower() == topic.lower():
             result.append({"id": book['id'], "title": book['title']})
     return jsonify(result)
 
+# Get information about a specific book by ID
 @app.route('/info/<int:id>')
 def info(id):
     data = read_catalog()
+
+        # Search for the book by ID
     for book in data:
         if int(book['id']) == id:
             return jsonify(book)
     return jsonify({"error": "not found"}), 404
 
+# Update book quantity after purchase
 @app.route('/update/<int:id>', methods=['POST'])
 def update(id):
     data = read_catalog()
@@ -55,6 +64,13 @@ def update(id):
             else:
                 return jsonify({"message": "out of stock"})
     return jsonify({"error": "not found"}), 404
+
+
+# Get all books
+@app.route('/books')
+def books():
+    data = read_catalog()
+    return jsonify(data)
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5001)
