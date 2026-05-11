@@ -1,10 +1,9 @@
 from flask import Flask, jsonify
 import csv
 
-# Create Flask application instance
 app = Flask(__name__)
 
-# Define the CSV file that stores the catalog data
+
 FILE = "catalog.csv"
 
 def read_catalog():
@@ -51,7 +50,7 @@ def info(id):
             return jsonify(book)
     return jsonify({"error": "not found"}), 404
 
-# Update book quantity after purchase
+# Update book quantity 
 @app.route('/update/<int:id>', methods=['POST'])
 def update(id):
     data = read_catalog()

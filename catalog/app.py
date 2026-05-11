@@ -34,7 +34,7 @@ def home():
     return "Catalog working correctly"
 
 
-# SEARCH (now includes quantity + price)
+# SEARCH 
 @app.route('/search/<topic>')
 def search(topic):
     data = read_catalog()
@@ -52,7 +52,7 @@ def search(topic):
     return jsonify(result)
 
 
-# INFO (always shows full details including quantity)
+# INFO 
 @app.route('/info/<int:id>')
 def info(id):
     data = read_catalog()

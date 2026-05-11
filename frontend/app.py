@@ -25,7 +25,7 @@ def home():
     return "Frontend working correctly!"
 
 
-# ---------------- SEARCH ----------------
+#  SEARCH 
 @app.route('/search/<topic>')
 def search(topic):
     global catalog_index
@@ -53,7 +53,7 @@ def search(topic):
     return jsonify(data)
 
 
-# ---------------- INFO ----------------
+#  INFO 
 @app.route('/info/<int:id>')
 def info(id):
     global catalog_index
@@ -81,7 +81,7 @@ def info(id):
     return jsonify(data)
 
 
-# ---------------- PURCHASE ----------------
+# PURCHASE
 @app.route('/purchase/<int:id>', methods=['POST'])
 def purchase(id):
     global order_index

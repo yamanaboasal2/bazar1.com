@@ -4,7 +4,7 @@ import time
 
 app = Flask(__name__)
 
-# IMPORTANT: داخل docker لازم اسم service مش localhost
+
 CATALOG_URL = "http://catalog:5001"
 
 orders = []
