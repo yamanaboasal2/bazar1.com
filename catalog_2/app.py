@@ -1,10 +1,11 @@
 from flask import Flask, jsonify
 import csv
 
+# Create Flask application instance
 app = Flask(__name__)
 
+# Define the CSV file that stores the catalog data
 FILE = "catalog.csv"
-
 
 def read_catalog():
     data = []
@@ -12,14 +13,10 @@ def read_catalog():
         with open(FILE, newline='') as f:
             reader = csv.DictReader(f)
             for row in reader:
-                row["id"] = int(row["id"])
-                row["quantity"] = int(row["quantity"])
-                row["price"] = str(row["price"])
                 data.append(row)
     except:
         return []
     return data
-
 
 def write_catalog(data):
     with open(FILE, 'w', newline='') as f:
@@ -28,71 +25,52 @@ def write_catalog(data):
         writer.writeheader()
         writer.writerows(data)
 
-
 @app.route("/")
 def home():
-    return "Catalog working correctly"
+    return "Catalog working correctly "
 
-
-# SEARCH (now includes quantity + price)
+# Search books by topic
 @app.route('/search/<topic>')
 def search(topic):
     data = read_catalog()
     result = []
-
+     # Filter books by topic
     for book in data:
         if book['topic'].lower() == topic.lower():
-            result.append({
-                "id": book["id"],
-                "title": book["title"],
-                "quantity": book["quantity"],
-                "price": book["price"]
-            })
-
+            result.append({"id": book['id'], "title": book['title']})
     return jsonify(result)
 
-
-# INFO (always shows full details including quantity)
+# Get information about a specific book by ID
 @app.route('/info/<int:id>')
 def info(id):
     data = read_catalog()
 
+        # Search for the book by ID
     for book in data:
-        if book['id'] == id:
-            return jsonify({
-                "id": book["id"],
-                "title": book["title"],
-                "topic": book["topic"],
-                "quantity": book["quantity"],
-                "price": book["price"]
-            })
-
+        if int(book['id']) == id:
+            return jsonify(book)
     return jsonify({"error": "not found"}), 404
 
-
-# UPDATE STOCK
+# Update book quantity after purchase
 @app.route('/update/<int:id>', methods=['POST'])
 def update(id):
     data = read_catalog()
-
     for book in data:
-        if book['id'] == id:
-
-            if book['quantity'] > 0:
-                book['quantity'] -= 1
+        if int(book['id']) == id:
+            if int(book['quantity']) > 0:
+                book['quantity'] = str(int(book['quantity']) - 1)
                 write_catalog(data)
-                return jsonify({"message": "updated", "new_quantity": book["quantity"]})
-
-            return jsonify({"message": "out of stock"}), 400
-
+                return jsonify({"message": "updated"})
+            else:
+                return jsonify({"message": "out of stock"})
     return jsonify({"error": "not found"}), 404
 
 
-# GET ALL BOOKS
+# Get all books
 @app.route('/books')
 def books():
-    return jsonify(read_catalog())
-
+    data = read_catalog()
+    return jsonify(data)
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5001)
+    app.run(host="0.0.0.0", port=5003)

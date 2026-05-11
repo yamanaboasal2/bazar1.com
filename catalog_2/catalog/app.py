@@ -12,9 +12,6 @@ def read_catalog():
         with open(FILE, newline='') as f:
             reader = csv.DictReader(f)
             for row in reader:
-                row["id"] = int(row["id"])
-                row["quantity"] = int(row["quantity"])
-                row["price"] = str(row["price"])
                 data.append(row)
     except:
         return []
@@ -34,7 +31,7 @@ def home():
     return "Catalog working correctly"
 
 
-# SEARCH (now includes quantity + price)
+# SEARCH 
 @app.route('/search/<topic>')
 def search(topic):
     data = read_catalog()
@@ -42,30 +39,19 @@ def search(topic):
 
     for book in data:
         if book['topic'].lower() == topic.lower():
-            result.append({
-                "id": book["id"],
-                "title": book["title"],
-                "quantity": book["quantity"],
-                "price": book["price"]
-            })
+            result.append(book)
 
     return jsonify(result)
 
 
-# INFO (always shows full details including quantity)
+# INFO 
 @app.route('/info/<int:id>')
 def info(id):
     data = read_catalog()
 
     for book in data:
-        if book['id'] == id:
-            return jsonify({
-                "id": book["id"],
-                "title": book["title"],
-                "topic": book["topic"],
-                "quantity": book["quantity"],
-                "price": book["price"]
-            })
+        if int(book['id']) == id:
+            return jsonify(book)
 
     return jsonify({"error": "not found"}), 404
 
@@ -76,12 +62,12 @@ def update(id):
     data = read_catalog()
 
     for book in data:
-        if book['id'] == id:
+        if int(book['id']) == id:
 
-            if book['quantity'] > 0:
-                book['quantity'] -= 1
+            if int(book['quantity']) > 0:
+                book['quantity'] = str(int(book['quantity']) - 1)
                 write_catalog(data)
-                return jsonify({"message": "updated", "new_quantity": book["quantity"]})
+                return jsonify({"message": "updated"})
 
             return jsonify({"message": "out of stock"}), 400
 
@@ -95,4 +81,4 @@ def books():
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5001)
+    app.run(host="0.0.0.0", port=5003)

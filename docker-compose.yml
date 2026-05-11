@@ -1,20 +1,35 @@
 services:
+
   frontend:
     build: ./frontend
     ports:
       - "5000:5000"
     depends_on:
       - catalog
+      - catalog_2
       - order
+      - order_2
 
   catalog:
     build: ./catalog
     ports:
       - "5001:5001"
+    volumes:
+      - ./catalog/catalog.csv:/app/catalog.csv
+
+  catalog_2:
+    build: ./catalog
+    ports:
+      - "5003:5001"
+    volumes:
+      - ./catalog/catalog.csv:/app/catalog.csv
 
   order:
     build: ./order
     ports:
       - "5002:5002"
-    depends_on:
-      - catalog
+
+  order_2:
+    build: ./order
+    ports:
+      - "5004:5002"
