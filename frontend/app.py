@@ -16,10 +16,7 @@ order_servers = [
 catalog_index = 0
 order_index = 0
 
-# cache for info requests
 cache = {}
-
-# cache for search requests
 search_cache = {}
 
 
@@ -28,82 +25,82 @@ def home():
     return "Frontend working correctly!"
 
 
+# ---------------- SEARCH ----------------
 @app.route('/search/<topic>')
 def search(topic):
-
     global catalog_index
 
-    # check search cache
+    print(f"\n[SEARCH REQUEST] topic = {topic}", flush=True)
+
     if topic in search_cache:
-        print("SEARCH CACHE HIT", flush=True)
+        print("[SEARCH CACHE HIT]", flush=True)
         return jsonify(search_cache[topic])
 
-    print("SEARCH CACHE MISS", flush=True)
+    print("[SEARCH CACHE MISS]", flush=True)
 
-    # round robin load balancing
     server = catalog_servers[catalog_index]
-    catalog_index = (catalog_index + 1) % 2
+    catalog_index = (catalog_index + 1) % len(catalog_servers)
 
-    print("FORWARDED TO:", server, flush=True)
+    print(f"[FORWARDING] {server}", flush=True)
 
     resp = requests.get(f"{server}/search/{topic}")
-
     data = resp.json()
 
-    # save result in cache
     search_cache[topic] = data
 
+    print(f"[SEARCH DONE] found {len(data)} books", flush=True)
+
     return jsonify(data)
 
 
+# ---------------- INFO ----------------
 @app.route('/info/<int:id>')
 def info(id):
-
     global catalog_index
 
-    # check info cache
+    print(f"\n[INFO REQUEST] id = {id}", flush=True)
+
     if id in cache:
-        print("CACHE HIT", flush=True)
+        print("[CACHE HIT]", flush=True)
         return jsonify(cache[id])
 
-    print("CACHE MISS", flush=True)
+    print("[CACHE MISS]", flush=True)
 
-    # round robin load balancing
     server = catalog_servers[catalog_index]
-    catalog_index = (catalog_index + 1) % 2
+    catalog_index = (catalog_index + 1) % len(catalog_servers)
 
-    print("FORWARDED TO:", server, flush=True)
+    print(f"[FORWARDING] {server}", flush=True)
 
     resp = requests.get(f"{server}/info/{id}")
-
     data = resp.json()
 
-    # save result in cache
     cache[id] = data
+
+    print(f"[CACHE STORE] id {id} cached", flush=True)
 
     return jsonify(data)
 
 
+# ---------------- PURCHASE ----------------
 @app.route('/purchase/<int:id>', methods=['POST'])
 def purchase(id):
-
     global order_index
 
-    # round robin load balancing
-    server = order_servers[order_index]
-    order_index = (order_index + 1) % 2
+    print(f"\n[PURCHASE REQUEST] id = {id}", flush=True)
 
-    print("FORWARDED TO:", server, flush=True)
+    server = order_servers[order_index]
+    order_index = (order_index + 1) % len(order_servers)
+
+    print(f"[FORWARDING] {server}", flush=True)
 
     resp = requests.post(f"{server}/purchase/{id}")
 
-    # invalidate info cache
+    # invalidate caches
     if id in cache:
-        print("INVALIDATING INFO CACHE", flush=True)
-        del cache[id]
+        print("[CACHE INVALIDATED: INFO]", flush=True)
+        cache.pop(id, None)
 
-    # invalidate search cache
-    print("INVALIDATING SEARCH CACHE", flush=True)
+    print("[CACHE INVALIDATED: SEARCH]", flush=True)
     search_cache.clear()
 
     return jsonify(resp.json())
